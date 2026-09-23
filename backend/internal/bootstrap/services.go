@@ -9,6 +9,7 @@ import (
 	documenttemplatefeature "github.com/moh-sso-dashboard/internal/features/document_templates"
 	documentfeature "github.com/moh-sso-dashboard/internal/features/documents"
 	emailfeature "github.com/moh-sso-dashboard/internal/features/email"
+	feedbackfeature "github.com/moh-sso-dashboard/internal/features/feedback"
 	rbacfeature "github.com/moh-sso-dashboard/internal/features/rbac"
 	sessionfeature "github.com/moh-sso-dashboard/internal/features/sessions"
 	storagelocationfeature "github.com/moh-sso-dashboard/internal/features/storage_locations"
@@ -51,6 +52,7 @@ type services struct {
 	DocumentTemplateColumns documenttemplatefeature.ColumnService
 	Import                  *importsvc.Service
 	RBAC                    *rbacfeature.Service
+	Feedback                feedbackfeature.Service
 }
 
 type serviceDependencies struct {
@@ -251,6 +253,8 @@ func buildServices(deps serviceDependencies) services {
 	rbacService.SetKeycloakGroupMembershipManager(deps.AdminKeycloak)
 	rbacService.SetFrontendBaseURL(deps.Config.FrontendBaseURL)
 
+	feedbackService := feedbackfeature.NewService(deps.Repositories.Feedback)
+
 	return services{
 		Email:                   emailService,
 		EmailFeature:            emailFeatureService,
@@ -279,5 +283,6 @@ func buildServices(deps serviceDependencies) services {
 		DocumentTemplateColumns: documentTemplateColumnService,
 		Import:                  importService,
 		RBAC:                    rbacService,
+		Feedback:                feedbackService,
 	}
 }

@@ -41,6 +41,9 @@ const (
 	IssueTrackerEditor      = "issue_tracker_editor"
 	IssueTrackerManager     = "issue_tracker_manager"
 
+	FeedbackViewer  = "feedback_viewer"
+	FeedbackManager = "feedback_manager"
+
 	DocumentViewer    = "document_viewer"
 	DocumentEditor    = "document_editor"
 	DocumentProcessor = "document_processor"

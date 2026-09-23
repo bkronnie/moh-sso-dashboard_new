@@ -53,6 +53,9 @@ const (
 
 	PermissionReportBrowserRead Permission = "report_browser:read"
 
+	PermissionFeedbackRead   Permission = "feedback:read"
+	PermissionFeedbackTriage Permission = "feedback:triage"
+
 	PermissionOutbreakAccess Permission = "outbreak:access"
 	PermissionOutbreakManage Permission = "outbreak:manage"
 
@@ -118,6 +121,9 @@ var AllPermissions = []Permission{
 	PermissionIssueTrackerComment,
 
 	PermissionReportBrowserRead,
+
+	PermissionFeedbackRead,
+	PermissionFeedbackTriage,
 
 	PermissionOutbreakAccess,
 	PermissionOutbreakManage,

@@ -225,6 +225,13 @@ var systemRolePermissions = map[string]map[string][]Permission{
 			PermissionIssueTrackerReopen,
 			PermissionIssueTrackerComment,
 		},
+		FeedbackViewer: {
+			PermissionFeedbackRead,
+		},
+		FeedbackManager: {
+			PermissionFeedbackRead,
+			PermissionFeedbackTriage,
+		},
 		DocumentViewer: {
 			PermissionDocumentsRead,
 			PermissionDocumentTemplatesRead,
@@ -295,7 +302,7 @@ var defaultSystemRolesForRealmRole = map[string]map[string][]string{
 		SystemSettings:       {SettingsAccess},
 	},
 	RoleManager: {
-		SystemDataStatistics: {DataStatisticsAccess, SurveillanceManager, ReportBrowserManager, IssueTrackerManager, DocumentManager},
+		SystemDataStatistics: {DataStatisticsAccess, SurveillanceManager, ReportBrowserManager, IssueTrackerManager, FeedbackManager, DocumentManager},
 		SystemUtilities:      {UtilitiesAccess},
 		SystemSettings:       {SettingsAccess},
 	},

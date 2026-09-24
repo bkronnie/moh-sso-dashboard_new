@@ -13,6 +13,7 @@ import {
   dataVisualizerRoute,
   documentsRoute,
   eServicesRoute,
+  feedbackTriageRoute,
   issueTrackerRoute,
   reportBrowserRoute,
   surveillanceRoute,
@@ -36,6 +37,7 @@ import {
   dataVisualizerLifecycles,
   dataValidationLifecycles,
   documentsLifecycles,
+  feedbackTriageLifecycles,
   issueTrackerLifecycles,
   reportBrowserLifecycles,
   surveillanceLifecycles,
@@ -191,6 +193,18 @@ export const userRoutes = (
             basename="/apps/dwh/issue-tracker"
           />,
           withSystemAccess(SYSTEMS.dataStatistics, accessFromRoute(issueTrackerRoute)),
+        )}
+      />
+
+      <Route
+        path="feedback-triage/*"
+        element={userPage(
+          <SingleSpaApp
+            appName="@moh-sso/feedback-triage"
+            lifecycles={feedbackTriageLifecycles}
+            basename="/apps/dwh/feedback-triage"
+          />,
+          withSystemAccess(SYSTEMS.dataStatistics, accessFromRoute(feedbackTriageRoute)),
         )}
       />
     </Route>

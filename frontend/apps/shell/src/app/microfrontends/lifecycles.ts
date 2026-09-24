@@ -24,6 +24,9 @@ export const eServicesLifecycles = () =>
 export const emailLifecycles = () =>
   import("@moh-sso/email/single-spa") as Promise<MicrofrontendLifecycle>;
 
+export const feedbackTriageLifecycles = () =>
+  import("@moh-sso/feedback-triage/single-spa") as Promise<MicrofrontendLifecycle>;
+
 export const issueTrackerLifecycles = () =>
   import("@moh-sso/issue-tracker/single-spa") as Promise<MicrofrontendLifecycle>;
 

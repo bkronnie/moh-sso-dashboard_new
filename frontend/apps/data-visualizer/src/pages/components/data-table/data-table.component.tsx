@@ -21,8 +21,8 @@ interface ListProps {
   columns: any;
   data: any;
   selectedIssue?: any;
-  closeView: () => void;
-  handleIssueClick: (row: any) => void;
+  closeView?: () => void;
+  handleIssueClick?: (row: any) => void;
   totalItems?: number;
   currentPage?: number;
   currentPageSize?: number;
@@ -30,6 +30,12 @@ interface ListProps {
   selectedRowIds?: string[];
   onSelectRow?: (rowId: string, checked: boolean) => void;
   onSelectAll?: (checked: boolean) => void;
+  // Overrides what renders inside an expanded row. Defaults to the
+  // IssueDetail view below (this component's original, only behavior) when
+  // omitted, so existing callers (issue-tracker) need no changes. A caller
+  // with its own detail/edit view (e.g. feedback-triage) passes this
+  // instead of forking the table to get a different expanded row.
+  renderExpandedContent?: (item: any, rowId: string) => React.ReactNode;
 }
 
 const DataList: React.FC<ListProps> = ({
@@ -44,6 +50,7 @@ const DataList: React.FC<ListProps> = ({
   selectedRowIds,
   onSelectRow,
   onSelectAll,
+  renderExpandedContent,
 }) => {
   /* -----------------------------
    * Pagination
@@ -138,7 +145,7 @@ const DataList: React.FC<ListProps> = ({
                             />
                           )}
                           {row.cells.map((cell) => {
-                            if (cell.info.header === "issue") {
+                            if (cell.info.header === "issue" && handleIssueClick) {
                               return (
                                   <TableCell key={cell.id}>
                                     <button
@@ -157,7 +164,9 @@ const DataList: React.FC<ListProps> = ({
                         <TableExpandedRow colSpan={headers.length + (onSelectRow ? 2 : 1)}>
                           {row.isExpanded && (
                               <section>
-                                <IssueDetail selectedIssue={issue} goToBack={closeView} showBack={false}/>
+                                {renderExpandedContent
+                                  ? renderExpandedContent(issue, row.id)
+                                  : <IssueDetail selectedIssue={issue} goToBack={closeView ?? (() => {})} showBack={false}/>}
                               </section>
                           )}
                         </TableExpandedRow>

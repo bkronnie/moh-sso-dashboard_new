@@ -50,4 +50,6 @@ export const PERMISSIONS = {
   issueTrackerClose: "issue_tracker:close",
   issueTrackerReopen: "issue_tracker:reopen",
   issueTrackerComment: "issue_tracker:comment",
+  feedbackRead: "feedback:read",
+  feedbackTriage: "feedback:triage",
 } as const satisfies Record<string, Permission>;

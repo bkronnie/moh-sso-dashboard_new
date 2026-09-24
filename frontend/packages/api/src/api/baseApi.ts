@@ -206,6 +206,7 @@ export const baseApi = createApi({
     "DQARules",
     "DQARuns",
     "DQAFlags",
+    "Feedback",
   ],
 
   endpoints: () => ({}),

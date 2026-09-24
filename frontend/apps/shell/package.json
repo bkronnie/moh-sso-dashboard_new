@@ -22,6 +22,7 @@
     "@moh-sso/documents": "0.1.0",
     "@moh-sso/e-services": "0.1.0",
     "@moh-sso/email": "0.1.0",
+    "@moh-sso/feedback-triage": "0.1.0",
     "@moh-sso/issue-tracker": "0.1.0",
     "@moh-sso/microfrontend": "0.1.0",
     "@moh-sso/rbac": "0.1.0",

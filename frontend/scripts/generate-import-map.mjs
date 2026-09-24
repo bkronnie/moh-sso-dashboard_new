@@ -7,7 +7,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 
 const apps = [
 "announcements", "audit", "clients", "data-validation", "data-visualizer",
-  "documents", "e-services", "email", "issue-tracker", "report-browser",
+  "documents", "e-services", "email", "feedback-triage", "issue-tracker", "report-browser",
   "rbac", "surveillance", "users", "utilities"
 ];
 

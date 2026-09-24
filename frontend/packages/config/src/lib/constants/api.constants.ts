@@ -100,6 +100,14 @@ export const API = {
   },
 
   // --------------------------------------------------
+  // Feedback Triage (proxies dwh_visualization server-to-server)
+  // --------------------------------------------------
+  feedback: {
+    list: () => `${API_BASE}/feedback`,
+    triage: (id: number | string) => `${API_BASE}/feedback/${id}/triage`,
+  },
+
+  // --------------------------------------------------
   // Data validation
   // --------------------------------------------------
   dataValidation: {

@@ -10,6 +10,7 @@ const appScripts = {
   documents: "dev:mf:documents",
   "e-services": "dev:mf:e-services",
   email: "dev:mf:email",
+  "feedback-triage": "dev:mf:feedback-triage",
   "issue-tracker": "dev:mf:issue-tracker",
   "report-browser": "dev:mf:report-browser",
   rbac: "dev:mf:rbac",

@@ -89,4 +89,6 @@ export type Permission =
   | "issue_tracker:assign"
   | "issue_tracker:close"
   | "issue_tracker:reopen"
-  | "issue_tracker:comment";
+  | "issue_tracker:comment"
+  | "feedback:read"
+  | "feedback:triage";

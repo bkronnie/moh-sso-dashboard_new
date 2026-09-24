@@ -47,6 +47,37 @@ func TestToFeedbackResponse_SectionDisplayFallback(t *testing.T) {
 	}
 }
 
+// TestToFeedbackResponse_FiltersSnapshotPassesThrough pins down that Phase
+// 7's filters snapshot map is carried through unchanged (nil stays nil, a
+// populated map isn't dropped or reshaped).
+func TestToFeedbackResponse_FiltersSnapshotPassesThrough(t *testing.T) {
+	entry := FeedbackEntry{FiltersSnapshot: map[string]string{"district": "Kampala", "year": "2026"}}
+	got := toFeedbackResponse(entry)
+	if len(got.FiltersSnapshot) != 2 || got.FiltersSnapshot["district"] != "Kampala" || got.FiltersSnapshot["year"] != "2026" {
+		t.Errorf("FiltersSnapshot = %v, want %v", got.FiltersSnapshot, entry.FiltersSnapshot)
+	}
+
+	empty := toFeedbackResponse(FeedbackEntry{})
+	if empty.FiltersSnapshot != nil {
+		t.Errorf("FiltersSnapshot = %v, want nil for an entry with none set", empty.FiltersSnapshot)
+	}
+}
+
+// TestToFeedbackResponse_HasComponentSnapshotPassesThrough pins down Phase
+// 8's boolean flag — a plain bool passthrough, but worth a test since a
+// bool's zero value (false) is easy to accidentally leave correct by
+// omission rather than by an actual field mapping.
+func TestToFeedbackResponse_HasComponentSnapshotPassesThrough(t *testing.T) {
+	got := toFeedbackResponse(FeedbackEntry{HasComponentSnapshot: true})
+	if !got.HasComponentSnapshot {
+		t.Error("HasComponentSnapshot = false, want true")
+	}
+	got = toFeedbackResponse(FeedbackEntry{HasComponentSnapshot: false})
+	if got.HasComponentSnapshot {
+		t.Error("HasComponentSnapshot = true, want false")
+	}
+}
+
 func TestToFeedbackResponses_EmptyInputReturnsEmptySliceNotNil(t *testing.T) {
 	got := toFeedbackResponses(nil)
 	if got == nil {

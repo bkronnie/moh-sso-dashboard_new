@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Dropdown, InlineNotification, Loading, TextInput } from "@carbon/react";
-import { Download } from "@carbon/react/icons";
+import { Download, Launch } from "@carbon/react/icons";
 import { PERMISSIONS, PermissionGuard } from "@moh-sso/auth";
+import { API } from "@moh-sso/config";
 import { useToast } from "@moh-sso/ui";
 
 import DataList from "../../../data-visualizer/src/pages/components/data-table/data-table.component.tsx";
@@ -31,6 +32,23 @@ const PAGE_LIMIT = 50;
 // full FeedbackEntry (spread in), since DataList hands the matched row
 // object straight to renderExpandedContent — that's how the detail/edit
 // form gets the fields (comment, jira*, etc.) this column set doesn't show.
+//
+// status/severity render as plain text, not colored Carbon Tag elements —
+// tried once (2026-09-24), reverted the same day: the shared DataList
+// component (data-table.component.tsx) forces a table remount by computing
+// `JSON.stringify(paginatedData)` on the full row set. That's safe for plain
+// strings/numbers, but a row field holding a real React element (a <Tag>)
+// picks up a circular `_owner`/Fiber reference once React actually renders
+// it client-side, and JSON.stringify throws on that — which, with no error
+// boundary in this app, unmounts the whole page (confirmed live: header
+// rendered, then blanked once real feedback rows loaded and got stringified).
+// An `renderToStaticMarkup` (SSR) test beforehand missed this because SSR
+// doesn't build a Fiber tree at all, so it never exercises the circular
+// reference — SSR-testing a client-rendering concern was the actual mistake,
+// not the Tag idea itself. Re-adding colored badges needs the shared
+// component's remount-key made safe against non-serializable cell values
+// first (e.g. a JSON.stringify replacer that special-cases React elements),
+// not just reverted here.
 const columnHeaders = [
   { key: "report", header: "Report" },
   { key: "section", header: "Section" },
@@ -44,6 +62,18 @@ const columnHeaders = [
 function formatDate(unixSeconds?: number) {
   if (!unixSeconds) return "-";
   return new Date(unixSeconds * 1000).toLocaleString();
+}
+
+// Phase 7: renders the reporter's active report filters at submission time
+// as "district=Kampala, year=2026" — empty/absent for entries submitted
+// before this shipped. Mirrors dwh_visualization's own
+// formatFiltersSnapshot (public/js/feedback-triage.js).
+function formatFiltersSnapshot(filters?: Record<string, string>): string {
+  if (!filters) return "";
+  return Object.entries(filters)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}=${v}`)
+    .join(", ");
 }
 
 // Program Area isn't a field dwh_visualization's feedback rows carry
@@ -75,6 +105,7 @@ function toCsv(rows: FeedbackEntry[]): string {
     ["Comment", (e) => e.comment],
     ["Submitted By", (e) => e.username],
     ["Submitted At", (e) => formatDate(e.created_at)],
+    ["Filters at Submission", (e) => formatFiltersSnapshot(e.filters_snapshot)],
   ];
   const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
   const header = cols.map(([label]) => escape(label)).join(",");
@@ -294,19 +325,34 @@ export default function FeedbackTriage() {
         />
       ) : null}
 
-      <DataList
-        columns={columnHeaders}
-        data={tableRows}
-        renderExpandedContent={(row) => (
-          <FeedbackDetailForm entry={row as FeedbackEntry} onSaved={handleSaved} onSaveError={handleSaveError} />
+      <div className="feedback-triage-table-container">
+        {isFetching && visibleEntries.length === 0 ? (
+          <div className="feedback-triage-loading-state">
+            <Loading small withOverlay={false} />
+          </div>
+        ) : (
+          <>
+            <DataList
+              columns={columnHeaders}
+              data={tableRows}
+              renderExpandedContent={(row) => (
+                <FeedbackDetailForm entry={row as FeedbackEntry} onSaved={handleSaved} onSaveError={handleSaveError} />
+              )}
+            />
+            {/* A filter-triggered refetch keeps the previous rows on screen
+                (isFetching true, visibleEntries still non-empty) — a small
+                inline spinner rather than replacing the table avoids the
+                whole list flickering away and back on every Apply click. */}
+            {isFetching ? <Loading small withOverlay={false} /> : null}
+          </>
         )}
-      />
 
-      {isFetching ? <Loading small withOverlay={false} /> : null}
-
-      {!isFetching && visibleEntries.length === 0 ? (
-        <p className="feedback-triage-empty">No feedback entries match the current filters.</p>
-      ) : null}
+        {!isFetching && visibleEntries.length === 0 ? (
+          <div className="feedback-triage-empty">
+            <p>No feedback entries match the current filters.</p>
+          </div>
+        ) : null}
+      </div>
 
       {hasMore && !programAreaFilter ? (
         <div className="feedback-triage-load-more">
@@ -365,16 +411,75 @@ function FeedbackDetailForm({ entry, onSaved, onSaveError }: FeedbackDetailFormP
     }
   };
 
+  // Links out to dwh_visualization's Report Catalog, straight into a Live
+  // Data preview of the exact component this feedback was submitted about --
+  // see Feedback_Triage_Migration_Work_Plan.md Phase 6. Deliberately a plain
+  // link to another site's page, not a re-render of the component here: this
+  // app doesn't duplicate dwh_visualization's chart/table rendering logic.
+  // Always clickable, even with no component_id (rows submitted before
+  // 2026-09-23, or subsection-only feedback) -- dwh_visualization's own
+  // openReportFromURLParam() already falls back gracefully to the report's
+  // Mapping modal when it can't resolve one specific component, so this
+  // link is never a dead end, just sometimes less precise.
+  //
+  // "View Snapshot" (Phase 8) answers a different question -- "what did the
+  // reporter actually see," a frozen render captured at submission time, vs.
+  // Preview's "does this look like this today." Unlike Preview, genuinely
+  // disabled when there's nothing to show: no snapshot was captured (old
+  // entry, section/report-level feedback, or capture failed), so there's no
+  // graceful fallback to offer.
+
   return (
     <div className="feedback-triage-detail">
       <div className="feedback-triage-detail-comment">
-        <strong>Comment ({entry.username}):</strong>
+        <div className="feedback-triage-detail-comment-header">
+          <strong>Comment ({entry.username}):</strong>
+          <div className="feedback-triage-detail-comment-links">
+            <Button
+              kind="ghost"
+              size="sm"
+              renderIcon={Launch}
+              href={API.dwh.reportCatalogPreview(entry.report_id, entry.component_id, entry.section_id, entry.subsection_id)}
+              target="_blank"
+              rel="noopener"
+            >
+              Preview in Report Catalog
+            </Button>
+            {entry.has_component_snapshot && entry.component_id ? (
+              <Button
+                kind="ghost"
+                size="sm"
+                renderIcon={Launch}
+                href={API.dwh.feedbackSnapshotPreview(entry.report_id, entry.component_id, entry.id)}
+                target="_blank"
+                rel="noopener"
+              >
+                View Snapshot
+              </Button>
+            ) : (
+              <Button
+                kind="ghost"
+                size="sm"
+                renderIcon={Launch}
+                disabled
+                title="No snapshot was captured for this entry (it may predate this feature, or have no single component to snapshot)"
+              >
+                View Snapshot
+              </Button>
+            )}
+          </div>
+        </div>
         <p>{entry.comment}</p>
         {entry.recommendation ? (
           <>
             <strong>Recommendation:</strong>
             <p>{entry.recommendation}</p>
           </>
+        ) : null}
+        {formatFiltersSnapshot(entry.filters_snapshot) ? (
+          <p className="feedback-triage-filters-snapshot">
+            <strong>Filters at submission:</strong> {formatFiltersSnapshot(entry.filters_snapshot)}
+          </p>
         ) : null}
       </div>
 

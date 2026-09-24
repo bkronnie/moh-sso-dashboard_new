@@ -176,7 +176,8 @@ systems:
         {"id":"data-visualizer","label":"Data Visualizer","path":"/apps/dwh/data-visualizer","permission":"data_quality:read","icon":"chart","description":"Data visualization/Export from the NDWH for all programs.","order":30,"displayInLauncher":true},
         {"id":"documents","label":"Document Management","path":"/apps/dwh/documents","permission":"documents:read","icon":"documents","description":"Upload and manage health data documents.","order":40,"displayInLauncher":true},
         {"id":"surveillance","label":"Surveillance","path":"/apps/dwh/surveillance","permission":"surveillance:read","icon":"warning-alt","description":"Review surveillance indicators, alerts, and reports.","order":50,"displayInLauncher":true},
-        {"id":"issue-tracker","label":"Issue Tracking","path":"/apps/dwh/issue-tracker","permission":"issue_tracker:read","icon":"tracker","description":"Track and resolve data quality issues.","order":60,"displayInLauncher":true}
+        {"id":"issue-tracker","label":"Issue Tracking","path":"/apps/dwh/issue-tracker","permission":"issue_tracker:read","icon":"tracker","description":"Track and resolve data quality issues.","order":60,"displayInLauncher":true},
+        {"id":"feedback-triage","label":"Feedback Triage","path":"/apps/dwh/feedback-triage","permission":"feedback:read","icon":"tracker","description":"Review, assign, and track report feedback submitted from dwh_visualization report pages.","order":70,"displayInLauncher":true}
       ]
     enabled: true
     accessRoles:
@@ -193,6 +194,8 @@ systems:
       - issue_tracker_contributor
       - issue_tracker_editor
       - issue_tracker_manager
+      - feedback_viewer
+      - feedback_manager
       - document_viewer
       - document_editor
       - document_processor
@@ -294,6 +297,17 @@ systems:
           - issue_tracker:close
           - issue_tracker:reopen
           - issue_tracker:comment
+      - name: feedback_viewer
+        displayName: Feedback Viewer
+        description: Read-only access to feedback submitted from dwh_visualization report pages
+        permissions:
+          - feedback:read
+      - name: feedback_manager
+        displayName: Feedback Manager
+        description: Can triage feedback (status, assignment, sign-off, Jira reference)
+        permissions:
+          - feedback:read
+          - feedback:triage
       - name: document_viewer
         displayName: Document Viewer
         description: Read-only access to documents and document templates
@@ -976,6 +990,30 @@ groups:
                 - access
               access_profile:
                 - issue-tracker-viewer
+          - name: Feedback Managers
+            displayName: Feedback Managers
+            description: Users who triage feedback (status, assignment, sign-off, Jira reference)
+            type: access
+            systemRoles:
+              data-statistics:
+                - feedback_manager
+            attributes:
+              group_type:
+                - access
+              access_profile:
+                - feedback-manager
+          - name: Feedback Viewers
+            displayName: Feedback Viewers
+            description: Read-only access to feedback submitted from dwh_visualization report pages
+            type: access
+            systemRoles:
+              data-statistics:
+                - feedback_viewer
+            attributes:
+              group_type:
+                - access
+              access_profile:
+                - feedback-viewer
           - name: Document Managers
             displayName: Document Managers
             description: Full document and template management access
@@ -1168,6 +1206,14 @@ groupMemberships:
     groups:
       - /MOH/Platform Managers
       - /MOH/Data and Statistics/Issue Tracker Managers
+  - username: feedback.viewer
+    groups:
+      - /MOH/Portal Users
+      - /MOH/Data and Statistics/Feedback Viewers
+  - username: feedback.manager
+    groups:
+      - /MOH/Platform Managers
+      - /MOH/Data and Statistics/Feedback Managers
   - username: data.operations.officer
     groups:
       - /MOH/Portal Users

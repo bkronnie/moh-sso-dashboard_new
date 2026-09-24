@@ -59,6 +59,17 @@ export type FeedbackEntry = {
 
   created_at: number;
   updated_at?: number;
+
+  // The reporter's active report filters (district/year/month/etc.) at
+  // submission time. Empty/absent for entries submitted before this
+  // shipped (2026-09-24, migration Phase 7).
+  filters_snapshot?: Record<string, string>;
+
+  // Whether dwh_visualization has a frozen component render stored for
+  // this entry (migration Phase 8) — drives the "View Snapshot" link's
+  // enabled state. False for entries with no component_id, entries
+  // submitted before this shipped, or where capture failed.
+  has_component_snapshot: boolean;
 };
 
 export type GetFeedbackParams = {

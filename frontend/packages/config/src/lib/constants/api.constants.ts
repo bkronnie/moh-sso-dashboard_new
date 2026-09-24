@@ -1,5 +1,6 @@
 type RuntimeAppConfig = {
   API_BASE_URL?: string;
+  DWH_BASE_URL?: string;
 };
 
 function getRuntimeApiBaseUrl() {
@@ -11,10 +12,28 @@ function getRuntimeApiBaseUrl() {
     ?.API_BASE_URL;
 }
 
+function getRuntimeDwhBaseUrl() {
+  if (typeof globalThis === "undefined" || !("window" in globalThis)) {
+    return undefined;
+  }
+
+  return (globalThis.window as Window & { __APP_CONFIG__?: RuntimeAppConfig }).__APP_CONFIG__
+    ?.DWH_BASE_URL;
+}
+
 const API_BASE_URL =
   getRuntimeApiBaseUrl() ||
   import.meta.env.VITE_API_BASE_URL ||
   "https://dashboards.health.go.ug/ssobackend";
+
+// dwh_visualization's own public site (not its API — that's FEEDBACK_SERVICE_BASE_URL,
+// server-to-server only) — used for browser-facing cross-links, e.g. Feedback
+// Triage's "Preview" link into Report Catalog's Live Data modal
+// (Feedback_Triage_Migration_Work_Plan.md Phase 6).
+const DWH_BASE_URL =
+  getRuntimeDwhBaseUrl() ||
+  import.meta.env.VITE_DWH_BASE_URL ||
+  "https://dashboards.health.go.ug";
 
 const API_ROOT = `${API_BASE_URL}/api`;
 const API_VERSION = "v1";
@@ -105,6 +124,43 @@ export const API = {
   feedback: {
     list: () => `${API_BASE}/feedback`,
     triage: (id: number | string) => `${API_BASE}/feedback/${id}/triage`,
+  },
+
+  // --------------------------------------------------
+  // dwh_visualization (browser-facing cross-links, not API calls)
+  // --------------------------------------------------
+  dwh: {
+    // Opens dwh_visualization's Report Catalog straight into a component's
+    // Live Data preview — the exact section/subsection/component a feedback
+    // entry was submitted about. componentId is preferred when known (a
+    // stable id); omit it and the link still opens, falling back to the
+    // report's Mapping modal on the dwh_visualization side (see
+    // report-catalog.js's openReportFromURLParam) since old feedback rows
+    // (pre-2026-09-23) never captured one. See Feedback_Triage_Migration_Work_Plan.md
+    // Phase 6 for the full design. sectionId/subsectionId (Phase 9 tier 3):
+    // harmless to always pass when known — dwh_visualization only reads them
+    // when componentId doesn't resolve to anything (section/report-level
+    // feedback), landing on the first visual in that subsection/section
+    // instead of dropping straight to the mapping table.
+    reportCatalogPreview: (reportId: string, componentId?: string, sectionId?: string, subsectionId?: string) => {
+      const params = new URLSearchParams({ reportId, mode: "live" });
+      if (componentId) params.set("componentId", componentId);
+      if (subsectionId) params.set("subsectionId", subsectionId);
+      if (sectionId) params.set("sectionId", sectionId);
+      return `${DWH_BASE_URL}/report-catalog.html?${params.toString()}`;
+    },
+
+    // Opens the same Report Catalog Preview modal, but straight into the
+    // "As Submitted" tab — a frozen render of the component captured at
+    // submission time (Phase 8), not a fresh query. componentId is required
+    // here (unlike reportCatalogPreview's graceful fallback) because a
+    // snapshot only exists for component-level feedback in the first place —
+    // callers should only build this link when entry.has_component_snapshot
+    // is true. See Feedback_Triage_Migration_Work_Plan.md Phase 8.
+    feedbackSnapshotPreview: (reportId: string, componentId: string, feedbackId: number | string) => {
+      const params = new URLSearchParams({ reportId, mode: "snapshot", componentId, feedbackId: String(feedbackId) });
+      return `${DWH_BASE_URL}/report-catalog.html?${params.toString()}`;
+    },
   },
 
   // --------------------------------------------------

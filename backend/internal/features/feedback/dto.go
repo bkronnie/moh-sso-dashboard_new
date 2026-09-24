@@ -65,6 +65,15 @@ type FeedbackResponse struct {
 
 	CreatedAt int64 `json:"created_at"`
 	UpdatedAt int64 `json:"updated_at,omitempty"`
+
+	// FiltersSnapshot (Phase 7): the reporter's active report filters at
+	// submission time, empty for entries submitted before it shipped.
+	FiltersSnapshot map[string]string `json:"filters_snapshot,omitempty"`
+
+	// HasComponentSnapshot (Phase 8): whether a frozen component render is
+	// stored for this entry on the dwh_visualization side — drives the
+	// "View Snapshot" link's enabled state.
+	HasComponentSnapshot bool `json:"has_component_snapshot"`
 }
 
 // FeedbackListResponse is the GET /feedback response envelope.

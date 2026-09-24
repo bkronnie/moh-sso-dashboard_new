@@ -149,6 +149,14 @@ services:
 
       RETRY_MAX_ATTEMPTS: ${RETRY_MAX_ATTEMPTS:-3}
       RETRY_BASE_DELAY: ${RETRY_BASE_DELAY:-2s}
+
+      # --------------------------------------------------
+      # Feedback Triage proxy (internal/features/feedback) -- defaults to
+      # off/unconfigured; substituted from the invoking shell's environment
+      # or a root .env, never hardcoded here.
+      # --------------------------------------------------
+      FEEDBACK_SERVICE_BASE_URL: ${FEEDBACK_SERVICE_BASE_URL:-}
+      FEEDBACK_SERVICE_API_KEY: ${FEEDBACK_SERVICE_API_KEY:-}
     ports:
       - "9000:9000"
     volumes:

@@ -44,6 +44,9 @@ func toFeedbackResponse(e FeedbackEntry) FeedbackResponse {
 
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
+
+		FiltersSnapshot:      e.FiltersSnapshot,
+		HasComponentSnapshot: e.HasComponentSnapshot,
 	}
 }
 

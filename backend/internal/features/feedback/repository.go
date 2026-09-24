@@ -78,6 +78,20 @@ type FeedbackEntry struct {
 
 	CreatedAt int64 `json:"createdAt"`
 	UpdatedAt int64 `json:"updatedAt,omitempty"`
+
+	// FiltersSnapshot (added 2026-09-24, migration Phase 7): the reporter's
+	// active report filters (district/year/month/etc.) at submission time.
+	// Empty for entries submitted before this shipped on the dwh_visualization
+	// side.
+	FiltersSnapshot map[string]string `json:"filtersSnapshot,omitempty"`
+
+	// HasComponentSnapshot (added 2026-09-24, migration Phase 8): whether
+	// dwh_visualization has a frozen component render stored for this entry
+	// — the actual snapshot is never sent here, only this boolean (drives
+	// the "View Snapshot" link's enabled state); the real payload is fetched
+	// by the browser directly from dwh_visualization's report-catalog.html,
+	// the same link-out pattern Phase 6's Preview link already uses.
+	HasComponentSnapshot bool `json:"hasComponentSnapshot"`
 }
 
 // ListFilter is the set of filters GET /api/feedback (dwh_visualization)

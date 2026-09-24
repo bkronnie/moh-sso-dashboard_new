@@ -93,9 +93,18 @@ const DataList: React.FC<ListProps> = ({
     paginatedData.length > 0 &&
     paginatedData.every((item: any) => selectedRowIds?.includes(String(item.id)));
 
+  // Carbon's DataTable diffs incoming `rows` by id only, not by cell
+  // content -- if a row's id is unchanged it silently keeps rendering the
+  // cell values it first saw for that id, even after the `rows` prop
+  // updates (e.g. a status/assignee edit saved in place). Keying the
+  // DataTable on the actual visible content forces it to remount and pick
+  // up the new values whenever they change, while staying stable (no
+  // remount) across renders that don't change what's on screen.
+  const dataTableKey = useMemo(() => JSON.stringify(paginatedData), [paginatedData]);
+
   return (
     <>
-      <DataTable rows={paginatedData} headers={columns}>
+      <DataTable key={dataTableKey} rows={paginatedData} headers={columns}>
         {({
             rows,
             headers,

@@ -91,6 +91,7 @@ frontend/
 |   |-- documents/
 |   |-- e-services/
 |   |-- email/
+|   |-- feedback-triage/
 |   |-- issue-tracker/
 |   |-- rbac/
 |   |-- report-browser/
@@ -121,6 +122,7 @@ frontend/
 | Documents | `@moh-sso/documents` | Document upload, metadata, process history, download, and reprocess flows. |
 | E-services | `@moh-sso/e-services` | E-service entry surfaces. |
 | Email | `@moh-sso/email` | Email queue, send, retry, status, and delivery management. |
+| Feedback Triage | `@moh-sso/feedback-triage` | Review, assign, and track report feedback submitted from dwh_visualization (proxied through the backend). |
 | Issue Tracker | `@moh-sso/issue-tracker` | Data quality issue tracking flows. |
 | RBAC | `@moh-sso/rbac` | System-aware RBAC governance, sync, drift, role, permission, and access management. |
 | Report Browser | `@moh-sso/report-browser` | Report browsing module. |

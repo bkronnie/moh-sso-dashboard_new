@@ -40,6 +40,7 @@ Apps version independently because they are future deployable units:
 - `@moh-sso/documents`
 - `@moh-sso/e-services`
 - `@moh-sso/email`
+- `@moh-sso/feedback-triage`
 - `@moh-sso/issue-tracker`
 - `@moh-sso/rbac`
 - `@moh-sso/report-browser`

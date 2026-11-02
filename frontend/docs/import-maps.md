@@ -107,6 +107,8 @@ The local map points apps to dev servers:
 - report-browser: `http://localhost:4110/single-spa.js`
 - e-services: `http://localhost:4111/single-spa.js`
 - utilities: `http://localhost:4112/single-spa.js`
+- report-scheduler: `http://localhost:4115/single-spa.js`
+- feedback-triage: `http://localhost:4116/single-spa.js`
 
 ## Import Map Overrides
 

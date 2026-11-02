@@ -60,6 +60,9 @@ const (
 	PermissionReportSchedulerHistory Permission = "report_scheduler:history"
 	PermissionReportSchedulerManage  Permission = "report_scheduler:manage"
 
+	PermissionFeedbackRead   Permission = "feedback:read"
+	PermissionFeedbackTriage Permission = "feedback:triage"
+
 	PermissionOutbreakAccess Permission = "outbreak:access"
 	PermissionOutbreakManage Permission = "outbreak:manage"
 
@@ -132,6 +135,9 @@ var AllPermissions = []Permission{
 		PermissionReportSchedulerExecute,
 		PermissionReportSchedulerHistory,
 		PermissionReportSchedulerManage,
+
+	PermissionFeedbackRead,
+	PermissionFeedbackTriage,
 
 	PermissionOutbreakAccess,
 	PermissionOutbreakManage,

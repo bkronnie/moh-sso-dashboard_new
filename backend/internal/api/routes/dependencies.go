@@ -10,6 +10,7 @@ import (
 	documenttemplatesfeature "github.com/moh-sso-dashboard/internal/features/document_templates"
 	documentsfeature "github.com/moh-sso-dashboard/internal/features/documents"
 	emailfeature "github.com/moh-sso-dashboard/internal/features/email"
+	feedbackfeature "github.com/moh-sso-dashboard/internal/features/feedback"
 	geojsonfeature "github.com/moh-sso-dashboard/internal/features/geojson"
 	metricsfeature "github.com/moh-sso-dashboard/internal/features/metrics"
 	notificationsfeature "github.com/moh-sso-dashboard/internal/features/notifications"
@@ -47,6 +48,7 @@ type Dependencies struct {
 	Email                   *emailfeature.Handler
 	RBAC                    *rbacfeature.Handler
 	ReportScheduler         *reportschedulerfeature.Handler
+	Feedback                *feedbackfeature.Handler
 
 	AuthenticatedRateLimitPerMin  int
 	AuthLoginRateLimitPerMin      int

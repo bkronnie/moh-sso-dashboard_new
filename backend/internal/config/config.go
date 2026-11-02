@@ -169,6 +169,7 @@ type Config struct {
 	Notification         NotificationConfig         `mapstructure:",squash"`
 	NotificationDelivery NotificationDeliveryConfig `mapstructure:",squash"`
 	SMS                  SMSConfig                  `mapstructure:",squash"`
+	Feedback             FeedbackConfig             `mapstructure:",squash"`
 }
 
 type SMTPConfig struct {
@@ -238,6 +239,17 @@ type SMSConfig struct {
 	TwilioAccountSID string `mapstructure:"TWILIO_ACCOUNT_SID"`
 	TwilioAuthToken  string `mapstructure:"TWILIO_AUTH_TOKEN"`
 	TwilioFromNumber string `mapstructure:"TWILIO_FROM_NUMBER"`
+}
+
+// FeedbackConfig is dwh_visualization's Feedback Triage proxy credential —
+// see local_scripts_docs/work_plans/Feedback_Triage_Migration_Work_Plan.md
+// (dwh_visualization repo) for the full design. BaseURL/APIKey are empty by
+// default; the feedback feature's repository returns a clear error on any
+// call until both are configured, rather than failing to boot.
+type FeedbackConfig struct {
+	BaseURL string        `mapstructure:"FEEDBACK_SERVICE_BASE_URL"`
+	APIKey  string        `mapstructure:"FEEDBACK_SERVICE_API_KEY"`
+	Timeout time.Duration `mapstructure:"FEEDBACK_SERVICE_TIMEOUT"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -366,6 +378,11 @@ func setDefaults() {
 	viper.SetDefault("SMS_FROM_NAME", "MOH")
 	viper.SetDefault("SMS_MAX_LENGTH", 160)
 	viper.SetDefault("SMS_SEND_TIMEOUT", "10s")
+
+	// ==================================================
+	// Feedback (dwh_visualization proxy) defaults
+	// ==================================================
+	viper.SetDefault("FEEDBACK_SERVICE_TIMEOUT", "10s")
 }
 
 func envBindings() map[string]string {
@@ -496,6 +513,9 @@ func envBindings() map[string]string {
 		"TWILIO_ACCOUNT_SID":                    "TWILIO_ACCOUNT_SID",
 		"TWILIO_AUTH_TOKEN":                     "TWILIO_AUTH_TOKEN",
 		"TWILIO_FROM_NUMBER":                    "TWILIO_FROM_NUMBER",
+		"FEEDBACK_SERVICE_BASE_URL":             "FEEDBACK_SERVICE_BASE_URL",
+		"FEEDBACK_SERVICE_API_KEY":              "FEEDBACK_SERVICE_API_KEY",
+		"FEEDBACK_SERVICE_TIMEOUT":              "FEEDBACK_SERVICE_TIMEOUT",
 	}
 }
 
@@ -665,6 +685,12 @@ func normalizeConfig(c *Config) {
 	}
 	if c.SMS.SendTimeout <= 0 {
 		c.SMS.SendTimeout = 10 * time.Second
+	}
+
+	c.Feedback.BaseURL = trimURL(c.Feedback.BaseURL)
+	c.Feedback.APIKey = strings.TrimSpace(c.Feedback.APIKey)
+	if c.Feedback.Timeout <= 0 {
+		c.Feedback.Timeout = 10 * time.Second
 	}
 	c.SMS.AfricasTalkingUsername = strings.TrimSpace(c.SMS.AfricasTalkingUsername)
 	c.SMS.AfricasTalkingAPIKey = strings.TrimSpace(c.SMS.AfricasTalkingAPIKey)
@@ -868,6 +894,10 @@ func validateConfig(c *Config) error {
 	}
 
 	if err := validateSMSConfig(c); err != nil {
+		return err
+	}
+
+	if err := validateFeedbackConfig(c); err != nil {
 		return err
 	}
 
@@ -1139,6 +1169,23 @@ func validateSMSConfig(c *Config) error {
 
 	if c.SMS.MaxLength <= 0 {
 		return errors.New("SMS_MAX_LENGTH must be greater than 0")
+	}
+
+	return nil
+}
+
+// validateFeedbackConfig allows the feedback-triage proxy to be left
+// unconfigured entirely (both empty — the feature simply isn't usable yet),
+// but rejects a half-configured state, which is more likely a mistake than
+// an intentional setup.
+func validateFeedbackConfig(c *Config) error {
+	hasBaseURL := c.Feedback.BaseURL != ""
+	hasAPIKey := c.Feedback.APIKey != ""
+	if hasBaseURL != hasAPIKey {
+		return errors.New("FEEDBACK_SERVICE_BASE_URL and FEEDBACK_SERVICE_API_KEY must be set together (or both left empty to disable the feedback-triage proxy)")
+	}
+	if c.Feedback.Timeout <= 0 {
+		return errors.New("FEEDBACK_SERVICE_TIMEOUT must be greater than 0")
 	}
 
 	return nil

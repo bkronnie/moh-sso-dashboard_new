@@ -23,6 +23,7 @@ import (
 	documenttemplatesfeature "github.com/moh-sso-dashboard/internal/features/document_templates"
 	documentsfeature "github.com/moh-sso-dashboard/internal/features/documents"
 	emailfeature "github.com/moh-sso-dashboard/internal/features/email"
+	feedbackfeature "github.com/moh-sso-dashboard/internal/features/feedback"
 	geojsonfeature "github.com/moh-sso-dashboard/internal/features/geojson"
 	metricsfeature "github.com/moh-sso-dashboard/internal/features/metrics"
 	notificationsfeature "github.com/moh-sso-dashboard/internal/features/notifications"
@@ -72,6 +73,7 @@ type HandlerSet struct {
 	Email                   *emailfeature.Handler
 	RBAC                    *rbacfeature.Handler
 	ReportScheduler         *reportschedulerfeature.Handler
+	Feedback                *feedbackfeature.Handler
 }
 
 type RateLimits struct {
@@ -113,6 +115,7 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 		Email:                         deps.Handlers.Email,
 		RBAC:                          deps.Handlers.RBAC,
 		ReportScheduler:               deps.Handlers.ReportScheduler,
+		Feedback:                      deps.Handlers.Feedback,
 		AuthenticatedRateLimitPerMin:  rateLimits.AuthenticatedPerMinute,
 		AuthLoginRateLimitPerMin:      rateLimits.AuthLoginPerMinute,
 		AuthCallbackRateLimitPerMin:   rateLimits.AuthCallbackPerMinute,

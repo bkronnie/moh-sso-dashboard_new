@@ -19,6 +19,7 @@ import (
 	documenttemplatesfeature "github.com/moh-sso-dashboard/internal/features/document_templates"
 	documentsfeature "github.com/moh-sso-dashboard/internal/features/documents"
 	emailfeature "github.com/moh-sso-dashboard/internal/features/email"
+	feedbackfeature "github.com/moh-sso-dashboard/internal/features/feedback"
 	geojsonfeature "github.com/moh-sso-dashboard/internal/features/geojson"
 	metricsfeature "github.com/moh-sso-dashboard/internal/features/metrics"
 	notificationsfeature "github.com/moh-sso-dashboard/internal/features/notifications"
@@ -95,6 +96,7 @@ func buildHandlers(deps handlerDependencies) handlers {
 	geoJSONHandler := geojsonfeature.NewHandler("./assets/geojson")
 	emailHandler := emailfeature.NewHandler(deps.Services.EmailFeature)
 	rbacHandler := rbacfeature.NewHandler(deps.Services.RBAC)
+	feedbackHandler := feedbackfeature.NewHandler(deps.Services.Feedback)
 
 	surveillanceHandler := surveillancefeature.NewHandler(
 		deps.Services.EpiWeeks,
@@ -149,7 +151,8 @@ func buildHandlers(deps handlerDependencies) handlers {
 			GeoJSON:                 geoJSONHandler,
 			Email:                   emailHandler,
 			RBAC:                    rbacHandler,
-				ReportScheduler:         reportschedulerfeature.NewHandler(deps.Services.ReportScheduler),
+			ReportScheduler:         reportschedulerfeature.NewHandler(deps.Services.ReportScheduler),
+			Feedback:                feedbackHandler,
 		},
 		Health: healthHandler,
 	}

@@ -23,6 +23,7 @@
     "@moh-sso/report-browser": "http://localhost:4110/single-spa.js",
     "@moh-sso/e-services": "http://localhost:4111/single-spa.js",
     "@moh-sso/utilities": "http://localhost:4112/single-spa.js",
-    "@moh-sso/report-scheduler": "http://localhost:4115/single-spa.js"
+    "@moh-sso/report-scheduler": "http://localhost:4115/single-spa.js",
+    "@moh-sso/feedback-triage": "http://localhost:4116/single-spa.js"
   }
 }

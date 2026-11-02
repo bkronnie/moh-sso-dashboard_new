@@ -20,6 +20,7 @@
     "@moh-sso/documents": "/portal/mf/documents/single-spa.js",
     "@moh-sso/e-services": "/portal/mf/e-services/single-spa.js",
     "@moh-sso/email": "/portal/mf/email/single-spa.js",
+    "@moh-sso/feedback-triage": "/portal/mf/feedback-triage/single-spa.js",
     "@moh-sso/issue-tracker": "/portal/mf/issue-tracker/single-spa.js",
     "@moh-sso/report-browser": "/portal/mf/report-browser/single-spa.js",
     "@moh-sso/rbac": "/portal/mf/rbac/single-spa.js",

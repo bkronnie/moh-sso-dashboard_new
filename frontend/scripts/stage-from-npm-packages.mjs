@@ -15,6 +15,7 @@ const apps = [
   "documents",
   "e-services",
   "email",
+  "feedback-triage",
   "issue-tracker",
   "report-browser", "report-scheduler",
   "rbac",

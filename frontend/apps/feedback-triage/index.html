@@ -1,0 +1,30 @@
+<!doctype html>
+<!--
+  Standalone dev harness -- NOT part of the shell/single-spa build, never
+  shipped. Vite's dev server auto-serves whatever index.html sits at an
+  app's root; the microfrontend library build (vite build) ignores this
+  file entirely (its entries are fixed by vite.microfrontend.config.ts).
+  See src/dev-standalone.tsx for what this mounts and why.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback Triage -- standalone dev</title>
+    <!--
+      Without this, @moh-sso/config's API_BASE_URL resolution
+      (packages/config/src/lib/constants/api.constants.ts) finds no
+      window.__APP_CONFIG__ and falls all the way back to the production
+      URL -- the shell normally sets this by loading public/config.development.js
+      (see apps/shell/index.html); inlined here since this harness has no
+      shell around it to do that.
+    -->
+    <script>
+      window.__APP_CONFIG__ = { API_BASE_URL: "http://localhost:9000", DWH_BASE_URL: "http://localhost:8080" };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/dev-standalone.tsx"></script>
+  </body>
+</html>

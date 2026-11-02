@@ -21,8 +21,8 @@ interface ListProps {
   columns: any;
   data: any;
   selectedIssue?: any;
-  closeView: () => void;
-  handleIssueClick: (row: any) => void;
+  closeView?: () => void;
+  handleIssueClick?: (row: any) => void;
   totalItems?: number;
   currentPage?: number;
   currentPageSize?: number;
@@ -30,6 +30,12 @@ interface ListProps {
   selectedRowIds?: string[];
   onSelectRow?: (rowId: string, checked: boolean) => void;
   onSelectAll?: (checked: boolean) => void;
+  // Overrides what renders inside an expanded row. Defaults to the
+  // IssueDetail view below (this component's original, only behavior) when
+  // omitted, so existing callers (issue-tracker) need no changes. A caller
+  // with its own detail/edit view (e.g. feedback-triage) passes this
+  // instead of forking the table to get a different expanded row.
+  renderExpandedContent?: (item: any, rowId: string) => React.ReactNode;
 }
 
 const DataList: React.FC<ListProps> = ({
@@ -44,6 +50,7 @@ const DataList: React.FC<ListProps> = ({
   selectedRowIds,
   onSelectRow,
   onSelectAll,
+  renderExpandedContent,
 }) => {
   /* -----------------------------
    * Pagination
@@ -86,9 +93,18 @@ const DataList: React.FC<ListProps> = ({
     paginatedData.length > 0 &&
     paginatedData.every((item: any) => selectedRowIds?.includes(String(item.id)));
 
+  // Carbon's DataTable diffs incoming `rows` by id only, not by cell
+  // content -- if a row's id is unchanged it silently keeps rendering the
+  // cell values it first saw for that id, even after the `rows` prop
+  // updates (e.g. a status/assignee edit saved in place). Keying the
+  // DataTable on the actual visible content forces it to remount and pick
+  // up the new values whenever they change, while staying stable (no
+  // remount) across renders that don't change what's on screen.
+  const dataTableKey = useMemo(() => JSON.stringify(paginatedData), [paginatedData]);
+
   return (
     <>
-      <DataTable rows={paginatedData} headers={columns}>
+      <DataTable key={dataTableKey} rows={paginatedData} headers={columns}>
         {({
             rows,
             headers,
@@ -138,7 +154,7 @@ const DataList: React.FC<ListProps> = ({
                             />
                           )}
                           {row.cells.map((cell) => {
-                            if (cell.info.header === "issue") {
+                            if (cell.info.header === "issue" && handleIssueClick) {
                               return (
                                   <TableCell key={cell.id}>
                                     <button
@@ -164,7 +180,9 @@ const DataList: React.FC<ListProps> = ({
                         <TableExpandedRow colSpan={headers.length + (onSelectRow ? 2 : 1)}>
                           {row.isExpanded && (
                               <section>
-                                <IssueDetail selectedIssue={issue} goToBack={closeView} showBack={false}/>
+                                {renderExpandedContent
+                                  ? renderExpandedContent(issue, row.id)
+                                  : <IssueDetail selectedIssue={issue} goToBack={closeView ?? (() => {})} showBack={false}/>}
                               </section>
                           )}
                         </TableExpandedRow>

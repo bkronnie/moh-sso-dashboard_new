@@ -7,6 +7,7 @@ import (
 	clientfeature "github.com/moh-sso-dashboard/internal/features/clients"
 	dataqualityfeature "github.com/moh-sso-dashboard/internal/features/data_quality"
 	emailfeature "github.com/moh-sso-dashboard/internal/features/email"
+	feedbackfeature "github.com/moh-sso-dashboard/internal/features/feedback"
 	geojsonfeature "github.com/moh-sso-dashboard/internal/features/geojson"
 	notificationsfeature "github.com/moh-sso-dashboard/internal/features/notifications"
 	rbacfeature "github.com/moh-sso-dashboard/internal/features/rbac"
@@ -31,6 +32,7 @@ func RegisterProtectedRoutes(protected *gin.RouterGroup, deps Dependencies) {
 	registerSurveillanceRoutes(protected, deps)
 	registerRBACProtectedRoutes(protected, deps)
 	reportschedulerfeature.RegisterProtectedRoutes(protected, deps.ReportScheduler)
+	registerFeedbackRoutes(protected, deps)
 }
 
 func registerAnnouncementRoutes(protected *gin.RouterGroup, deps Dependencies) {
@@ -71,4 +73,8 @@ func registerRBACProtectedRoutes(protected *gin.RouterGroup, deps Dependencies) 
 
 func registerNotificationRoutes(protected *gin.RouterGroup, deps Dependencies) {
 	notificationsfeature.RegisterProtectedRoutes(protected, deps.Notifications)
+}
+
+func registerFeedbackRoutes(protected *gin.RouterGroup, deps Dependencies) {
+	feedbackfeature.RegisterProtectedRoutes(protected, deps.Feedback)
 }

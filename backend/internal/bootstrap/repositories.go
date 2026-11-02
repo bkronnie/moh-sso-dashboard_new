@@ -9,6 +9,7 @@ import (
 	clientRepo "github.com/moh-sso-dashboard/internal/features/clients"
 	documentTemplateRepo "github.com/moh-sso-dashboard/internal/features/document_templates"
 	documentRepo "github.com/moh-sso-dashboard/internal/features/documents"
+	feedbackfeature "github.com/moh-sso-dashboard/internal/features/feedback"
 	rbacRepo "github.com/moh-sso-dashboard/internal/features/rbac"
 	sessionRepo "github.com/moh-sso-dashboard/internal/features/sessions"
 	storageLocationRepo "github.com/moh-sso-dashboard/internal/features/storage_locations"
@@ -45,6 +46,7 @@ type repositories struct {
 	Email                   emailRepo.EmailRepository
 	Surveillance            *surveillanceRepo.Repositories
 	RBAC                    rbacRepo.Repository
+	Feedback                feedbackfeature.Repository
 }
 
 func buildRepositories(
@@ -79,5 +81,6 @@ func buildRepositories(
 		Email:                   emailRepo.NewEmailRepository(cfg, store, *appLogger),
 		Surveillance:            surveillanceRepo.NewRepositories(store),
 		RBAC:                    rbacRepo.NewRepository(primaryDB),
+		Feedback:                feedbackfeature.NewHTTPRepository(cfg),
 	}
 }

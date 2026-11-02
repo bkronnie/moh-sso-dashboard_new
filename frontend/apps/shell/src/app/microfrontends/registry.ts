@@ -45,6 +45,13 @@ export const eServicesRoute: MicrofrontendRoute = {
   requiredPermissions: ["systems:launch"],
 };
 
+export const feedbackTriageRoute: MicrofrontendRoute = {
+  appName: "@moh-sso/feedback-triage",
+  path: "/apps/dwh/feedback-triage",
+  requiredPermissions: ["feedback:read"],
+  requiredSystems: ["data-statistics"],
+};
+
 export const emailRoute: MicrofrontendRoute = {
   appName: "@moh-sso/email",
   path: "/admin/emails",
@@ -107,6 +114,7 @@ export const registeredMicrofrontends: MicrofrontendRoute[] = [
   documentsRoute,
   eServicesRoute,
   emailRoute,
+  feedbackTriageRoute,
   issueTrackerRoute,
   reportBrowserRoute,
   reportSchedulerRoute,

@@ -7,6 +7,7 @@ export const microfrontendRoutes = {
   documents: "/apps/dwh/documents",
   eServices: "/apps/eservices",
   email: "/admin/emails",
+  feedbackTriage: "/apps/dwh/feedback-triage",
   issueTracker: "/apps/dwh/issue-tracker",
   reportBrowser: "/apps/dwh/dashboards",
   reportScheduler: "/apps/dwh/report-scheduler",

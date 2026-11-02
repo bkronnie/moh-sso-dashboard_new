@@ -37,7 +37,7 @@ import { UserHeader } from "../../../packages/ui/src/shell";
 
 import FeedbackTriage from "./pages/feedback-triage.component";
 
-import "../../shell/src/index.scss";
+import "./dev-standalone.scss";
 
 const store = configureStore({
   reducer: {
